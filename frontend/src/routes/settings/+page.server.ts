@@ -82,6 +82,7 @@ export const load: PageServerLoad = async (event) => {
 	let googleMapsEnabled = integrations.google_maps as boolean;
 	let stravaGlobalEnabled = integrations.strava.global as boolean;
 	let stravaUserEnabled = integrations.strava.user as boolean;
+	let garminUserEnabled = integrations.garmin.user as boolean;
 	let wandererEnabled = integrations.wanderer.exists as boolean;
 	let wandererExpired = integrations.wanderer.expired as boolean;
 
@@ -115,6 +116,7 @@ export const load: PageServerLoad = async (event) => {
 			googleMapsEnabled,
 			stravaGlobalEnabled,
 			stravaUserEnabled,
+			garminUserEnabled,
 			wandererEnabled,
 			wandererExpired,
 			apiKeys

@@ -3,8 +3,9 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
-from integrations.models import ImmichIntegration, StravaToken, WandererIntegration
+from integrations.models import ImmichIntegration, StravaToken, GarminToken, WandererIntegration
 from django.conf import settings
+from garminconnect import Garmin, GarminConnectTooManyRequestsError
 
 
 class IntegrationView(viewsets.ViewSet):
@@ -17,6 +18,16 @@ class IntegrationView(viewsets.ViewSet):
         google_map_integration = settings.GOOGLE_MAPS_API_KEY != ''
         strava_integration_global = settings.STRAVA_CLIENT_ID != '' and settings.STRAVA_CLIENT_SECRET != ''
         strava_integration_user = StravaToken.objects.filter(user=request.user).exists()
+        garmin_integration_user = GarminToken.objects.filter(user=request.user).first()
+        is_garmin_expired = False
+        if garmin_integration_user:
+            try:
+                garmin = Garmin()
+                garmin.client.loads(garmin_integration_user.session_data)
+                garmin_integration_user = garmin.client.is_authenticated()
+            except GarminConnectTooManyRequestsError:
+                is_garmin_expired = True
+
         wanderer_integration = WandererIntegration.objects.filter(user=request.user).exists()
         is_wanderer_expired = False
 
@@ -32,6 +43,10 @@ class IntegrationView(viewsets.ViewSet):
                 'strava': {
                     'global': strava_integration_global,
                     'user': strava_integration_user
+                },
+                'garmin': {
+                    'user': garmin_integration_user,
+                    'expired': is_garmin_expired
                 },
                 'wanderer': {
                     'exists': wanderer_integration,

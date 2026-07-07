@@ -13,6 +13,7 @@
 	import ImmichLogo from '$lib/assets/immich.svg';
 	import GoogleMapsLogo from '$lib/assets/google_maps.svg';
 	import StravaLogo from '$lib/assets/strava.svg';
+	import GarminLogo from '$lib/assets/garmin.svg';
 	import WandererLogoSrc from '$lib/assets/wanderer.svg';
 
 	export let data;
@@ -36,6 +37,7 @@
 	let googleMapsEnabled = data.props.googleMapsEnabled;
 	let stravaGlobalEnabled = data.props.stravaGlobalEnabled;
 	let stravaUserEnabled = data.props.stravaUserEnabled;
+	let garminUserEnabled = data.props.garminUserEnabled;
 	let wandererEnabled = data.props.wandererEnabled;
 	let wandererExpired = data.props.wandererExpired;
 	let activeSection: string = 'profile';
@@ -69,6 +71,14 @@
 		id: '',
 		copy_locally: true
 	};
+
+	let newGarminIntegration = {
+		email: '',
+		password: '',
+		mfa_code: ''
+	};
+	let garminMfaRequired: boolean = false;
+	let garminConnecting: boolean = false;
 
 	let newWandererIntegration = {
 		server_url: '',
@@ -350,6 +360,53 @@
 			stravaUserEnabled = false;
 		} else {
 			addToast('error', $t('strava.disconnect_error'));
+		}
+	}
+
+	async function garminConnect() {
+		garminConnecting = true;
+		const res = await fetch('/api/integrations/garmin/authorize/', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				email: newGarminIntegration.email,
+				password: newGarminIntegration.password,
+				mfa_code: newGarminIntegration.mfa_code || undefined
+			})
+		});
+		if (res.ok) {
+			const data = await res.json();
+			if (data.mfa_required) {
+				garminMfaRequired = true;
+				garminConnecting = false;
+			} else {
+				addToast('success', $t('garmin.connected'));
+				garminUserEnabled = true;
+				garminConnecting = false;
+				garminMfaRequired = false;
+				newGarminIntegration = { email: '', password: '', mfa_code: '' };
+			}
+		} else {
+			addToast('error', $t('garmin.connection_error'));
+			garminConnecting = false;
+		}
+	}
+
+	async function garminDisconnect() {
+		const res = await fetch('/api/integrations/garmin/disable/', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		if (res.ok) {
+			addToast('success', $t('garmin.disconnected'));
+			garminUserEnabled = false;
+			garminMfaRequired = false;
+		} else {
+			addToast('error', $t('garmin.disconnect_error'));
 		}
 	}
 
@@ -1431,6 +1488,104 @@
 												ℹ️ {$t('google_maps.google_maps_integration_desc_no_staff')}
 											</p>
 										{/if}
+									</div>
+								{/if}
+							</div>
+
+							<!-- Garmin Integration Section -->
+							<div class="p-6 bg-base-200 rounded-xl mb-4">
+								<div class="flex items-center gap-4 mb-4">
+									<img src={GarminLogo} alt="Garmin" class="w-8 h-8" />
+									<div>
+										<h3 class="text-xl font-bold">Garmin Connect</h3>
+										<p class="text-sm text-base-content/70">
+											{$t('garmin.garmin_integration_desc')}
+										</p>
+									</div>
+									{#if garminUserEnabled}
+										<div class="badge badge-success ml-auto">{$t('settings.connected')}</div>
+									{:else}
+										<div class="badge badge-error ml-auto">{$t('settings.disconnected')}</div>
+									{/if}
+								</div>
+
+								{#if !garminUserEnabled}
+									<div class="space-y-4">
+										{#if !garminMfaRequired}
+											<div class="form-control">
+												<label class="label">
+													<span class="label-text font-medium">{$t('garmin.email')}</span>
+												</label>
+												<input
+													type="email"
+													placeholder="user@example.com"
+													class="input input-bordered"
+													bind:value={newGarminIntegration.email}
+												/>
+											</div>
+											<div class="form-control">
+												<label class="label">
+													<span class="label-text font-medium">{$t('garmin.password')}</span>
+												</label>
+												<input
+													type="password"
+													class="input input-bordered"
+													bind:value={newGarminIntegration.password}
+												/>
+											</div>
+											<div class="text-center">
+												<button
+													class="btn btn-primary"
+													on:click={garminConnect}
+													disabled={garminConnecting || !newGarminIntegration.email || !newGarminIntegration.password}
+												>
+													🔗 {garminConnecting ? 'Connecting...' : $t('garmin.connect_account')}
+												</button>
+											</div>
+										{:else}
+											<div class="form-control">
+												<label class="label">
+													<span class="label-text font-medium">{$t('garmin.mfa_code')}</span>
+												</label>
+												<input
+													type="text"
+													class="input input-bordered"
+													bind:value={newGarminIntegration.mfa_code}
+													placeholder="000000"
+												/>
+											</div>
+											<p class="text-sm text-base-content/70">
+												{$t('garmin.mfa_required')}
+											</p>
+											<div class="text-center">
+												<button
+													class="btn btn-primary"
+													on:click={garminConnect}
+													disabled={garminConnecting || !newGarminIntegration.mfa_code}
+												>
+													🔗 {$t('garmin.connect_account')}
+												</button>
+											</div>
+										{/if}
+									</div>
+								{:else}
+									<div class="text-center">
+										<button class="btn btn-error" on:click={garminDisconnect}>
+											❌ {$t('garmin.disconnect')}
+										</button>
+									</div>
+								{/if}
+
+								{#if user.is_staff}
+									<div class="mt-4 p-4 bg-info/10 rounded-lg">
+										<p class="text-sm">
+											📖 {$t('immich.need_help')}
+											<a
+												class="link link-primary"
+												href="https://adventurelog.app/docs/configuration/garmin_integration.html"
+												target="_blank">{$t('navbar.documentation')}</a
+											>
+										</p>
 									</div>
 								{/if}
 							</div>

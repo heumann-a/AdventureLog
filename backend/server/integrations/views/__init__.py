@@ -1,4 +1,5 @@
 from .immich_view import ImmichIntegrationView, ImmichIntegrationViewSet
 from .integration_view import IntegrationView
 from .strava_view import StravaIntegrationView
+from .garmin_view import GarminIntegrationView
 from .wanderer_view import WandererIntegrationViewSet

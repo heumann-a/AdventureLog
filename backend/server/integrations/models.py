@@ -25,6 +25,18 @@ class StravaToken(models.Model):
     scope = models.CharField(max_length=255, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+class GarminToken(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='garmin_tokens')
+    email = models.EmailField(max_length=255)
+    session_data = models.TextField(null=True, blank=True)
+    last_activity_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.email}"
+
 class WandererIntegration(models.Model):
     server_url = models.CharField(max_length=255)
     username = models.CharField(max_length=255)

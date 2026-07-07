@@ -392,6 +392,59 @@ export type Trail = {
 	wanderer_link: string | null; // Optional link to the Wanderer trail
 };
 
+export type GarminActivity = {
+	id: number;
+	name: string;
+	type: string;
+	sport_type: string;
+	distance: number;
+	distance_km: number;
+	distance_miles: number;
+	moving_time: number;
+	elapsed_time: number;
+	rest_time: number | null;
+	total_elevation_gain: number;
+	estimated_elevation_loss: number | null;
+	elev_high: number;
+	elev_low: number;
+	total_elevation_range: number | null;
+	start_date: string;
+	start_date_local: string;
+	timezone: string;
+	timezone_raw: string;
+	average_speed: number;
+	average_speed_kmh: number;
+	average_speed_mph: number;
+	max_speed: number;
+	max_speed_kmh: number;
+	max_speed_mph: number;
+	pace_per_km_seconds: number;
+	pace_per_mile_seconds: number;
+	grade_adjusted_average_speed: number | null;
+	average_cadence: number | null;
+	average_watts: number | null;
+	max_watts: number | null;
+	kilojoules: number | null;
+	calories: number | null;
+	achievement_count: number | null;
+	kudos_count: number | null;
+	comment_count: number | null;
+	pr_count: number | null;
+	gear_id: string | null;
+	device_name: string | null;
+	trainer: boolean;
+	manual: boolean;
+	start_latlng: [number, number] | null;
+	end_latlng: [number, number] | null;
+	export_original: string | null;
+	export_gpx: string | null;
+	visibility: string | null;
+	photo_count: number;
+	has_heartrate: boolean;
+	flagged: boolean;
+	commute: boolean;
+};
+
 export type StravaActivity = {
 	id: number;
 	name: string;

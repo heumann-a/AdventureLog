@@ -1065,6 +1065,21 @@
 		"gpx_required": "Please upload the GPX file to complete the Strava import",
 		"not_enabled": "Strava integration is not enabled on this instance."
 	},
+	"garmin": {
+		"garmin_integration_desc": "Connect to Garmin Connect to import your activities into locations and visits",
+		"connect_account": "Connect Account",
+		"disconnect": "Disconnect",
+		"email": "Garmin Connect Email",
+		"password": "Garmin Connect Password",
+		"mfa_code": "MFA Code",
+		"mfa_required": "MFA code is required. Check your email or phone for a verification code.",
+		"connection_error": "Error connecting to Garmin Connect",
+		"authorization_error": "Error connecting to Garmin Connect",
+		"connected": "Successfully connected to Garmin Connect",
+		"disconnected": "Successfully disconnected from Garmin Connect",
+		"disconnect_error": "Error disconnecting from Garmin Connect",
+		"not_enabled": "Garmin Connect integration is not enabled on this instance."
+	},
 	"wanderer": {
 		"wanderer_integration_desc": "Connect to Wanderer to easily import and view your trails in locations",
 		"connection_error": "Error connecting to Wanderer",
