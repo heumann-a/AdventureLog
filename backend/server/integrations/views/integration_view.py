@@ -1,11 +1,9 @@
-import os
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from integrations.models import ImmichIntegration, StravaToken, GarminToken, WandererIntegration
 from django.conf import settings
-from garminconnect import Garmin, GarminConnectTooManyRequestsError
 
 
 class IntegrationView(viewsets.ViewSet):
@@ -21,12 +19,10 @@ class IntegrationView(viewsets.ViewSet):
         garmin_integration_user = GarminToken.objects.filter(user=request.user).exists()
         is_garmin_expired = False
         if garmin_integration_user:
-            try:
-                garmin = Garmin()
-                garmin.login(garmin_integration_user.session_data)
-                garmin_integration_user = garmin.client.is_authenticated
-            except GarminConnectTooManyRequestsError:
+            token_expiry = GarminToken.objects.filter(user=request.user).first().token_expiry
+            if token_expiry and token_expiry < timezone.now():
                 is_garmin_expired = True
+
 
         wanderer_integration = WandererIntegration.objects.filter(user=request.user).exists()
         is_wanderer_expired = False

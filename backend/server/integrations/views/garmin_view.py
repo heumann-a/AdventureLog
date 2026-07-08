@@ -3,9 +3,12 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 import logging
+import json
+import base64
 from datetime import datetime
 from django.shortcuts import redirect
 from django.conf import settings
+from django.utils import timezone
 from garminconnect import (
     Garmin,
     GarminConnectAuthenticationError,
@@ -22,7 +25,7 @@ class GarminIntegrationView(viewsets.ViewSet):
 
     def _get_garmin_client(self, user):
         token = GarminToken.objects.filter(user=user).first()
-        if not token or not token.session_data:
+        if not token or not token.tokenstorage:
             return None, Response({
                 'message': 'You need to authorize Garmin Connect first.',
                 'error': True,
@@ -31,7 +34,7 @@ class GarminIntegrationView(viewsets.ViewSet):
 
         try:
             garmin = Garmin()
-            garmin.client.loads(token.session_data)
+            garmin.client.loads(token.tokenstorage)
             if not garmin.client.is_authenticated:
                 return None, Response({
                     'message': 'Garmin Connect session expired. Please re-authorize.',
@@ -48,15 +51,30 @@ class GarminIntegrationView(viewsets.ViewSet):
             }, status=status.HTTP_502_BAD_GATEWAY)
 
     def _save_garmin_session(self, user, garmin, email):
-        print(f"{garmin.client.dumps()}")
-        session_data = garmin.client.dumps()
+        tokenstorage = garmin.client.dumps()
+        expiry_date = self._expire_at(garmin.client.di_token or garmin.client.jwt_web)
         GarminToken.objects.update_or_create(
             user=user,
             defaults={
                 'email': email,
-                'session_data': session_data,
+                'tokenstorage': tokenstorage,
+                'token_expiry': expiry_date
             }
         )
+
+    def _expire_at(self, token):
+        if not token:
+            return 0
+
+        parts = str(token).split(".")
+        if len(parts) >= 2:
+            payload_b64 = parts[1] + "=" * (-len(parts[1]) % 4)
+            payload = json.loads(
+                base64.urlsafe_b64decode(payload_b64.encode()).decode()
+            )
+            exp = payload.get("exp")
+            return timezone.make_aware(datetime.fromtimestamp(exp))
+        return 0
 
     @action(detail=False, methods=['post'], url_path='authorize')
     def authorize(self, request):
@@ -144,7 +162,7 @@ class GarminIntegrationView(viewsets.ViewSet):
 
     def refresh_garmin_session_if_needed(self, user):
         token = GarminToken.objects.filter(user=user).first()
-        if not token or not token.session_data:
+        if not token or not token.tokenstorage:
             return None, Response({
                 'message': 'You need to authorize Garmin Connect first.',
                 'error': True,
@@ -153,7 +171,7 @@ class GarminIntegrationView(viewsets.ViewSet):
 
         try:
             garmin = Garmin()
-            garmin.client.loads(token.session_data)
+            garmin.client.loads(token.tokenstorage)
             if not garmin.client.is_authenticated:
                 return None, Response({
                     'message': 'Garmin Connect session expired. Please re-authorize.',
