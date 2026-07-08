@@ -371,7 +371,7 @@
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				email: newGarminIntegration.email,
+					email: newGarminIntegration.email,
 				password: newGarminIntegration.password,
 				mfa_code: newGarminIntegration.mfa_code || undefined
 			})

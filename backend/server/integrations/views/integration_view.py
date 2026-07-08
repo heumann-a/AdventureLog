@@ -24,7 +24,7 @@ class IntegrationView(viewsets.ViewSet):
             try:
                 garmin = Garmin()
                 garmin.client.loads(garmin_integration_user.session_data)
-                garmin_integration_user = garmin.client.is_authenticated()
+                garmin_integration_user = garmin.client.is_authenticated
             except GarminConnectTooManyRequestsError:
                 is_garmin_expired = True
 
