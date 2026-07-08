@@ -18,12 +18,12 @@ class IntegrationView(viewsets.ViewSet):
         google_map_integration = settings.GOOGLE_MAPS_API_KEY != ''
         strava_integration_global = settings.STRAVA_CLIENT_ID != '' and settings.STRAVA_CLIENT_SECRET != ''
         strava_integration_user = StravaToken.objects.filter(user=request.user).exists()
-        garmin_integration_user = GarminToken.objects.filter(user=request.user).first()
+        garmin_integration_user = GarminToken.objects.filter(user=request.user).exists()
         is_garmin_expired = False
         if garmin_integration_user:
             try:
                 garmin = Garmin()
-                garmin.client.loads(garmin_integration_user.session_data)
+                garmin.login(garmin_integration_user.session_data)
                 garmin_integration_user = garmin.client.is_authenticated
             except GarminConnectTooManyRequestsError:
                 is_garmin_expired = True
