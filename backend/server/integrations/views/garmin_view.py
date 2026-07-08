@@ -145,6 +145,26 @@ class GarminIntegrationView(viewsets.ViewSet):
             frontend_url += '/'
         return redirect(f"{frontend_url}settings?tab=integrations")
 
+    @action(detail=False, methods=['patch'], url_path='settings')
+    def settings(self, request):
+        token = GarminToken.objects.filter(user=request.user).first()
+        if not token:
+            return Response({
+                'message': 'Garmin integration is not enabled for this user.',
+                'error': True,
+                'code': 'garmin.not_enabled'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        auto_refresh = request.data.get('auto_refresh')
+        if auto_refresh is not None:
+            token.auto_refresh = bool(auto_refresh)
+
+        token.save()
+        return Response({
+            'message': 'Garmin settings updated.',
+            'auto_refresh': token.auto_refresh
+        }, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['post'], url_path='disable')
     def disable(self, request):
         token = GarminToken.objects.filter(user=request.user).first()

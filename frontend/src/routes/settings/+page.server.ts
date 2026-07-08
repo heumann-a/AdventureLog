@@ -83,6 +83,7 @@ export const load: PageServerLoad = async (event) => {
 	let stravaGlobalEnabled = integrations.strava.global as boolean;
 	let stravaUserEnabled = integrations.strava.user as boolean;
 	let garminUserEnabled = integrations.garmin.user as boolean;
+	let garminAutoRefresh = integrations.garmin.auto_refresh as boolean;
 	let wandererEnabled = integrations.wanderer.exists as boolean;
 	let wandererExpired = integrations.wanderer.expired as boolean;
 
@@ -117,6 +118,7 @@ export const load: PageServerLoad = async (event) => {
 			stravaGlobalEnabled,
 			stravaUserEnabled,
 			garminUserEnabled,
+			garminAutoRefresh,
 			wandererEnabled,
 			wandererExpired,
 			apiKeys

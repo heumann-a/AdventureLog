@@ -38,6 +38,7 @@
 	let stravaGlobalEnabled = data.props.stravaGlobalEnabled;
 	let stravaUserEnabled = data.props.stravaUserEnabled;
 	let garminUserEnabled = data.props.garminUserEnabled;
+	let garminAutoRefresh = data.props.garminAutoRefresh;
 	let wandererEnabled = data.props.wandererEnabled;
 	let wandererExpired = data.props.wandererExpired;
 	let activeSection: string = 'profile';
@@ -79,6 +80,7 @@
 	};
 	let garminMfaRequired: boolean = false;
 	let garminConnecting: boolean = false;
+	let updatingGarminSettings: boolean = false;
 
 	let newWandererIntegration = {
 		server_url: '',
@@ -408,6 +410,25 @@
 		} else {
 			addToast('error', $t('garmin.disconnect_error'));
 		}
+	}
+
+	async function toggleGarminAutoRefresh() {
+		updatingGarminSettings = true;
+		const res = await fetch('/api/integrations/garmin/settings/', {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				auto_refresh: !garminAutoRefresh
+			})
+		});
+		if (res.ok) {
+			garminAutoRefresh = !garminAutoRefresh;
+		} else {
+			addToast('error', 'Failed to update Garmin settings');
+		}
+		updatingGarminSettings = false;
 	}
 
 	async function wandererDisconnect() {
@@ -1569,10 +1590,31 @@
 										{/if}
 									</div>
 								{:else}
-									<div class="text-center">
-										<button class="btn btn-error" on:click={garminDisconnect}>
-											❌ {$t('garmin.disconnect')}
-										</button>
+									<div class="space-y-4">
+										<div class="form-control">
+											<label class="label cursor-pointer justify-start gap-4">
+												<input
+													type="checkbox"
+													checked={garminAutoRefresh}
+													on:change={toggleGarminAutoRefresh}
+													disabled={updatingGarminSettings}
+													class="toggle toggle-primary"
+												/>
+												<div>
+													<span class="label-text font-medium">
+														{$t('garmin.auto_refresh')}
+													</span>
+													<p class="text-sm text-base-content/70">
+														{$t('garmin.auto_refresh_desc')}
+													</p>
+												</div>
+											</label>
+										</div>
+										<div class="text-center">
+											<button class="btn btn-error" on:click={garminDisconnect}>
+												❌ {$t('garmin.disconnect')}
+											</button>
+										</div>
 									</div>
 								{/if}
 

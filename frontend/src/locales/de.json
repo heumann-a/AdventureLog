@@ -1063,6 +1063,23 @@
 		"gpx_required": "Bitte laden Sie die GPX -Datei hoch, um den Strava -Import zu vervollständigen",
 		"not_enabled": "Die Strava-Integration ist in dieser Instanz nicht aktiviert."
 	},
+	"garmin": {
+		"garmin_integration_desc": "Stellen Sie eine Verbindung zu Garmin Connect her, um Ihre Aktivitäten in Orte und Besuche zu importieren",
+		"connect_account": "Konto verbinden",
+		"disconnect": "Trennen",
+		"email": "Garmin Connect E-Mail",
+		"password": "Garmin Connect Passwort",
+		"mfa_code": "MFA-Code",
+		"mfa_required": "MFA-Code erforderlich. Überprüfen Sie Ihre E-Mail oder Ihr Telefon auf einen Bestätigungscode.",
+		"connection_error": "Fehler beim Verbinden mit Garmin Connect",
+		"authorization_error": "Fehler beim Verbinden mit Garmin Connect",
+		"connected": "Erfolgreich mit Garmin Connect verbunden",
+		"disconnected": "Erfolgreich von Garmin Connect getrennt",
+		"disconnect_error": "Fehler beim Trennen von Garmin Connect",
+		"not_enabled": "Die Garmin Connect-Integration ist auf dieser Instanz nicht aktiviert.",
+		"auto_refresh": "Token automatisch aktualisieren",
+		"auto_refresh_desc": "Garmin-Sitzung vor Ablauf automatisch verlängern, um sie aktiv zu halten."
+	},
 	"wanderer": {
 		"connected": "Erfolgreich mit Wanderer verbunden",
 		"connection_error": "Fehler beim Verbinden zu Wanderer",

@@ -1078,7 +1078,9 @@
 		"connected": "Successfully connected to Garmin Connect",
 		"disconnected": "Successfully disconnected from Garmin Connect",
 		"disconnect_error": "Error disconnecting from Garmin Connect",
-		"not_enabled": "Garmin Connect integration is not enabled on this instance."
+		"not_enabled": "Garmin Connect integration is not enabled on this instance.",
+		"auto_refresh": "Auto-refresh Token",
+		"auto_refresh_desc": "Automatically refresh your Garmin session before expiry to keep it active."
 	},
 	"wanderer": {
 		"wanderer_integration_desc": "Connect to Wanderer to easily import and view your trails in locations",

@@ -16,12 +16,14 @@ class IntegrationView(viewsets.ViewSet):
         google_map_integration = settings.GOOGLE_MAPS_API_KEY != ''
         strava_integration_global = settings.STRAVA_CLIENT_ID != '' and settings.STRAVA_CLIENT_SECRET != ''
         strava_integration_user = StravaToken.objects.filter(user=request.user).exists()
-        garmin_integration_user = GarminToken.objects.filter(user=request.user).exists()
+        garmin_token = GarminToken.objects.filter(user=request.user).first()
+        garmin_integration_user = garmin_token is not None
         is_garmin_expired = False
-        if garmin_integration_user:
-            token_expiry = GarminToken.objects.filter(user=request.user).first().token_expiry
-            if token_expiry and token_expiry < timezone.now():
+        garmin_auto_refresh = False
+        if garmin_token:
+            if garmin_token.token_expiry and garmin_token.token_expiry < timezone.now():
                 is_garmin_expired = True
+            garmin_auto_refresh = garmin_token.auto_refresh
 
 
         wanderer_integration = WandererIntegration.objects.filter(user=request.user).exists()
@@ -42,7 +44,8 @@ class IntegrationView(viewsets.ViewSet):
                 },
                 'garmin': {
                     'user': garmin_integration_user,
-                    'expired': is_garmin_expired
+                    'expired': is_garmin_expired,
+                    'auto_refresh': garmin_auto_refresh
                 },
                 'wanderer': {
                     'exists': wanderer_integration,

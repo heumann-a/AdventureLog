@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('email', models.EmailField(max_length=255)),
                 ('tokenstorage', models.TextField(blank=True, null=True)),
                 ('token_expiry', models.DateTimeField(blank=True, null=True)),
-                ('last_activity_at', models.DateTimeField(blank=True, null=True)),
+                ('auto_refresh', models.BooleanField(default=False, help_text='Automatically refresh the Garmin session before expiry.')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
             ],
