@@ -15,7 +15,7 @@ from garminconnect import (
     GarminConnectConnectionError,
     GarminConnectTooManyRequestsError,
 )
-from integrations.models import GarminToken
+from integrations.models import GarminIntegration
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class GarminIntegrationView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def _get_garmin_client(self, user):
-        token = GarminToken.objects.filter(user=user).first()
+        token = GarminIntegration.objects.filter(user=user).first()
         if not token or not token.tokenstorage:
             return None, Response({
                 'message': 'You need to authorize Garmin Connect first.',
@@ -53,7 +53,7 @@ class GarminIntegrationView(viewsets.ViewSet):
     def _save_garmin_session(self, user, garmin, email):
         tokenstorage = garmin.client.dumps()
         expiry_date = self._expire_at(garmin.client.di_token or garmin.client.jwt_web)
-        GarminToken.objects.update_or_create(
+        GarminIntegration.objects.update_or_create(
             user=user,
             defaults={
                 'email': email,
@@ -147,7 +147,7 @@ class GarminIntegrationView(viewsets.ViewSet):
 
     @action(detail=False, methods=['patch'], url_path='settings')
     def settings(self, request):
-        token = GarminToken.objects.filter(user=request.user).first()
+        token = GarminIntegration.objects.filter(user=request.user).first()
         if not token:
             return Response({
                 'message': 'Garmin integration is not enabled for this user.',
@@ -167,7 +167,7 @@ class GarminIntegrationView(viewsets.ViewSet):
 
     @action(detail=False, methods=['post'], url_path='disable')
     def disable(self, request):
-        token = GarminToken.objects.filter(user=request.user).first()
+        token = GarminIntegration.objects.filter(user=request.user).first()
         if not token:
             return Response({
                 'message': 'Garmin integration is not enabled for this user.',
@@ -181,7 +181,7 @@ class GarminIntegrationView(viewsets.ViewSet):
         }, status=status.HTTP_204_NO_CONTENT)
 
     def refresh_garmin_session_if_needed(self, user):
-        token = GarminToken.objects.filter(user=user).first()
+        token = GarminIntegration.objects.filter(user=user).first()
         if not token or not token.tokenstorage:
             return None, Response({
                 'message': 'You need to authorize Garmin Connect first.',

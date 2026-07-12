@@ -25,7 +25,7 @@ class StravaToken(models.Model):
     scope = models.CharField(max_length=255, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-class GarminToken(models.Model):
+class GarminIntegration(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='garmin_tokens')
     email = models.EmailField(max_length=255)

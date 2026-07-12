@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
-from integrations.models import ImmichIntegration, StravaToken, GarminToken, WandererIntegration
+from integrations.models import ImmichIntegration, StravaToken, GarminIntegration, WandererIntegration
 from django.conf import settings
 
 
@@ -16,7 +16,7 @@ class IntegrationView(viewsets.ViewSet):
         google_map_integration = settings.GOOGLE_MAPS_API_KEY != ''
         strava_integration_global = settings.STRAVA_CLIENT_ID != '' and settings.STRAVA_CLIENT_SECRET != ''
         strava_integration_user = StravaToken.objects.filter(user=request.user).exists()
-        garmin_token = GarminToken.objects.filter(user=request.user).first()
+        garmin_token = GarminIntegration.objects.filter(user=request.user).first()
         garmin_integration_user = garmin_token is not None
         is_garmin_expired = False
         garmin_auto_refresh = False
