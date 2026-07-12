@@ -1196,7 +1196,11 @@
 						<div class="card-body">
 							<h2 class="card-title text-2xl mb-4">🗺️ {$t('navbar.map')}</h2>
 							<div class="rounded-lg overflow-hidden shadow-lg">
-								<CollectionMap bind:collection user={data.user} />
+								<CollectionMap
+										bind:collection
+										user={data.user}
+										canModify={canModifyCollection}
+								/>
 							</div>
 						</div>
 					</div>
